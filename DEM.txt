@@ -1,0 +1,41 @@
+var roi_geometry = roi.geometry();
+
+var elevation = SRTM.select('elevation')
+                .clip(roi_geometry)
+                 
+var slope = ee.Terrain.slope(elevation)
+
+var cuttingRegion = roi_geometry;
+
+Export.image.toDrive({
+  image: elevation,   
+  description: 'FH_Elevation',   
+  scale: 30, 
+  maxPixels: 1e13,
+  region: cuttingRegion });
+
+Export.image.toDrive({
+  image: slope,
+  description: 'FH_Slope',
+  scale: 30,
+  maxPixels: 1e13,
+  region: cuttingRegion });
+  
+// 可视化参数
+var args = {
+  crs: 'EPSG:3857',
+  dimensions: '300',
+  region: roi,
+  min: -2000,
+  max: 10000,
+  palette: 'green, blanchedalmond,orange,black ',
+  framesPerSecond: 12,
+};
+
+Map.addLayer(roi,{},'roi_Boundary');
+
+Map.centerObject(roi, 7);
+
+Map.addLayer(slope,{},'slope');
+
+Map.addLayer(elevation,args,'elevation');
